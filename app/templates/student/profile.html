@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}My Student Profile - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-person-circle text-navy fs-3"></i>
+    <h3 class="fw-bold text-navy mb-0">Student Profile & Settings</h3>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Student ID Card & Stats -->
+    <div class="col-lg-5">
+      <div class="card card-custom p-4 border-0 bg-white shadow-sm mb-4">
+        <div class="text-center mb-4">
+          <div class="kpi-icon-box bg-primary text-white mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2rem;">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <h4 class="fw-bold text-navy mb-0">{{ current_user.full_name }}</h4>
+          <span class="badge bg-primary-subtle text-primary mt-1 px-3 py-1 fs-6">
+            Student ID: {{ current_user.student_id }}
+          </span>
+          <p class="text-muted small mt-2 mb-0">{{ current_user.email }}</p>
+        </div>
+
+        <hr>
+
+        <div class="row g-2 text-center">
+          <div class="col-4">
+            <div class="p-2 bg-light rounded border">
+              <h4 class="fw-bold text-primary mb-0">{{ orders_count }}</h4>
+              <small class="text-muted" style="font-size: 0.75rem;">Orders</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 bg-light rounded border">
+              <h4 class="fw-bold text-teal mb-0" style="color: var(--secondary-teal);">{{ listings_count }}</h4>
+              <small class="text-muted" style="font-size: 0.75rem;">Listings</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 bg-light rounded border">
+              <h4 class="fw-bold text-dark mb-0">{{ complaints_count }}</h4>
+              <small class="text-muted" style="font-size: 0.75rem;">Tickets</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-2 border-top">
+          <div class="small text-muted mb-2">
+            <i class="bi bi-calendar3 me-2"></i>Campus Member Since: <strong>{{ current_user.created_at.strftime('%B %Y') }}</strong>
+          </div>
+          <div class="small text-muted mb-2">
+            <i class="bi bi-shield-check text-success me-2"></i>Account Status: <span class="badge bg-success">Verified Active</span>
+          </div>
+          <div class="small text-muted">
+            <i class="bi bi-geo-alt me-2"></i>Hostel / Block: <strong>{{ current_user.campus_block or 'Campus Resident' }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Update Contact Details -->
+    <div class="col-lg-7">
+      <div class="card card-custom p-4 border-0 bg-white shadow-sm mb-4">
+        <h5 class="fw-bold text-navy mb-3">
+          <i class="bi bi-sliders text-teal me-2" style="color: var(--secondary-teal);"></i>Update Campus Contact Details
+        </h5>
+        <p class="text-muted small">Keep your contact information updated so student buyers and sellers can coordinate pickups efficiently.</p>
+
+        <form method="POST" action="{{ url_for('student.profile') }}">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="full_name">Full Name (University Verified)</label>
+            <input type="text" class="form-control" id="full_name" value="{{ current_user.full_name }}" disabled readonly>
+            <small class="text-muted">Name changes require university administrative approval.</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="student_id">Student ID</label>
+            <input type="text" class="form-control" id="student_id" value="{{ current_user.student_id }}" disabled readonly>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="email">University Email</label>
+            <input type="email" class="form-control" id="email" value="{{ current_user.email }}" disabled readonly>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="phone">Phone / WhatsApp Number</label>
+            <input type="tel" class="form-control" id="phone" name="phone" value="{{ current_user.phone or '' }}" placeholder="+91 9876543210">
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold" for="campus_block">Hostel / Campus Room / Residence Block</label>
+            <input type="text" class="form-control" id="campus_block" name="campus_block" value="{{ current_user.campus_block or '' }}" placeholder="e.g. Hostel H-3, Room 210 or Day Scholar">
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-navy fw-semibold">
+              <i class="bi bi-save me-1"></i> Save Profile Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Quick Shortcuts -->
+      <div class="card card-custom p-3 border-0 bg-light">
+        <h6 class="fw-bold text-navy mb-2">Student Shortcuts</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{{ url_for('student.my_orders') }}" class="btn btn-outline-navy btn-sm">
+            <i class="bi bi-bag-check me-1"></i> My Placed Orders
+          </a>
+          <a href="{{ url_for('seller.dashboard') }}" class="btn btn-outline-teal btn-sm" style="color: var(--secondary-teal); border-color: var(--secondary-teal);">
+            <i class="bi bi-box-seam me-1"></i> Seller Hub & Listings
+          </a>
+          <a href="{{ url_for('student.complaints') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-shield-exclamation me-1"></i> Dispute Tickets
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

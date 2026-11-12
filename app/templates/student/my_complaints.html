@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}My Complaints & Disputes - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-shield-exclamation text-danger fs-3"></i>
+    <h3 class="fw-bold text-navy mb-0">Dispute & Complaint Center</h3>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Lodge a New Complaint -->
+    <div class="col-lg-5">
+      <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+        <h5 class="fw-bold text-navy mb-3">
+          <i class="bi bi-pencil-square text-primary me-2"></i>Lodge a New Complaint
+        </h5>
+        <p class="text-muted small">Campus administrators review all student dispute tickets within 24 hours.</p>
+
+        <form method="POST" action="{{ url_for('student.complaints') }}">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="order_id">Related Order (Optional)</label>
+            <select class="form-select" id="order_id" name="order_id">
+              <option value="">-- General Campus Inquiry / Not Order Specific --</option>
+              {% for ord in orders %}
+              <option value="{{ ord.id }}">{{ ord.order_number }} (₹{{ ord.total_amount }} - {{ ord.status }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="subject">Complaint Subject <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="subject" name="subject" placeholder="e.g. Item not as described / Seller missed meeting" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="description">Detailed Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Explain the issue clearly with dates, meeting locations, and specifics..." required></textarea>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-teal fw-semibold">
+              <i class="bi bi-send-fill me-1"></i> Submit Ticket to ERP Admin
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column: My Complaint History -->
+    <div class="col-lg-7">
+      <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+        <h5 class="fw-bold text-navy mb-3">
+          <i class="bi bi-clock-history text-secondary me-2"></i>My Ticket History ({{ complaints|length }})
+        </h5>
+
+        {% if complaints %}
+        <div class="accordion" id="complaintsAccordion">
+          {% for c in complaints %}
+          <div class="accordion-item mb-2 border rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="heading{{ c.id }}">
+              <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ c.id }}">
+                <div class="d-flex flex-wrap justify-content-between align-items-center w-100 me-3">
+                  <div>
+                    <strong class="text-navy me-2">{{ c.ticket_number }}</strong>
+                    <span class="text-muted small">{{ c.subject }}</span>
+                  </div>
+                  <div>
+                    <span class="badge {{ c.status_badge_class }}">{{ c.status }}</span>
+                  </div>
+                </div>
+              </button>
+            </h2>
+            <div id="collapse{{ c.id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#complaintsAccordion">
+              <div class="accordion-body bg-light">
+                <div class="d-flex justify-content-between text-muted small mb-2 border-bottom pb-1">
+                  <span>Filed on: {{ c.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                  {% if c.order %}
+                  <span>Order: <strong>{{ c.order.order_number }}</strong></span>
+                  {% endif %}
+                </div>
+                <p class="text-dark small mb-3">{{ c.description }}</p>
+
+                {% if c.admin_notes %}
+                <div class="p-3 bg-white rounded border border-success-subtle">
+                  <strong class="d-block text-success small mb-1">
+                    <i class="bi bi-check2-circle me-1"></i>Campus ERP Administrator Resolution:
+                  </strong>
+                  <p class="small text-muted mb-0">{{ c.admin_notes }}</p>
+                </div>
+                {% else %}
+                <div class="text-muted small fst-italic">
+                  <i class="bi bi-hourglass-split me-1"></i>Under active review by campus administration.
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-check-circle fs-1 text-success d-block mb-2"></i>
+          <p class="mb-0">You have no active or historical dispute tickets.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

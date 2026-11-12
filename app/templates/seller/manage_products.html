@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Manage Listings - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <span class="badge bg-teal text-white mb-1 px-3 py-1" style="background-color: var(--secondary-teal);">Product Catalog</span>
+      <h3 class="fw-bold text-navy mb-0">My Listed Products</h3>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('seller.add_product') }}" class="btn btn-teal">
+        <i class="bi bi-plus-circle me-1"></i> Add New Product
+      </a>
+      <a href="{{ url_for('seller.dashboard') }}" class="btn btn-outline-navy">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+    {% if products %}
+    <div class="table-responsive">
+      <table class="table align-middle table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" style="width: 80px;">Image</th>
+            <th scope="col">Product Title & Category</th>
+            <th scope="col">Condition</th>
+            <th scope="col">Price</th>
+            <th scope="col">Available Stock</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in products %}
+          <tr>
+            <td>
+              <img src="{{ url_for('static', filename='uploads/' + p.image_url) }}" alt="{{ p.title }}" class="rounded border" style="width: 60px; height: 60px; object-fit: cover;">
+            </td>
+            <td>
+              <strong class="text-navy d-block">{{ p.title }}</strong>
+              <small class="badge bg-light text-primary border">{{ p.category.name }}</small>
+            </td>
+            <td>
+              <span class="badge bg-secondary-subtle text-dark">{{ p.condition }}</span>
+            </td>
+            <td class="fw-bold text-primary">₹{{ p.price }}</td>
+            <td>
+              {% if p.stock_quantity > 0 %}
+                <span class="badge bg-success-subtle text-success fs-6">{{ p.stock_quantity }} unit{% if p.stock_quantity > 1 %}s{% endif %}</span>
+              {% else %}
+                <span class="badge bg-danger-subtle text-danger fs-6">Out of Stock</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.status == 'active' %}
+                <span class="badge bg-success">Active</span>
+              {% elif p.status == 'out_of_stock' %}
+                <span class="badge bg-warning text-dark">Out of Stock</span>
+              {% else %}
+                <span class="badge bg-secondary">Deactivated</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <a href="{{ url_for('student.product_detail', product_id=p.id) }}" class="btn btn-outline-info" title="View Public Listing" target="_blank">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{{ url_for('seller.edit_product', product_id=p.id) }}" class="btn btn-outline-primary" title="Edit Listing">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form method="POST" action="{{ url_for('seller.toggle_status', product_id=p.id) }}" class="d-inline">
+                  <button type="submit" class="btn btn-outline-warning" title="Toggle Active / Deactivate">
+                    <i class="bi bi-power"></i>
+                  </button>
+                </form>
+                <form method="POST" action="{{ url_for('seller.delete_product', product_id=p.id) }}" class="d-inline" onsubmit="return confirm('Delete this listing? If historical orders exist, it will be safely deactivated instead.');">
+                  <button type="submit" class="btn btn-outline-danger" title="Delete Listing">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-box-seam fs-1 d-block mb-3 text-secondary"></i>
+      <h4 class="fw-bold text-dark">No products listed yet</h4>
+      <p class="text-muted">Put your used textbooks, electronics, and dorm furniture up for sale.</p>
+      <a href="{{ url_for('seller.add_product') }}" class="btn btn-teal">
+        <i class="bi bi-plus-circle me-1"></i> List Your First Product
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

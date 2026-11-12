@@ -1,0 +1,108 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}ERP User Management - Campus Marketplace{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <span class="badge bg-primary px-3 py-1 mb-1">Central Registry</span>
+    <h3 class="fw-bold text-navy mb-0">Student & User Management</h3>
+    <p class="text-muted small mb-0">Search, monitor and manage active and suspended university student accounts.</p>
+  </div>
+</div>
+
+<!-- Search & Role Filter Bar -->
+<div class="card card-custom p-3 mb-4 border-0 bg-white shadow-sm">
+  <form method="GET" action="{{ url_for('admin.users') }}">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="Search by name, student ID or email...">
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <select class="form-select" name="role">
+          <option value="all" {% if role_filter == 'all' %}selected{% endif %}>All Roles</option>
+          <option value="student" {% if role_filter == 'student' %}selected{% endif %}>Students</option>
+          <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Administrators</option>
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-2">
+        <select class="form-select" name="status">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active Only</option>
+          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Deactivated Only</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-navy">Filter Users</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Users Table -->
+<div class="card card-custom p-4 border-0 bg-white shadow-sm">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold text-navy mb-0">Registered User Records ({{ users|length }})</h5>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table align-middle table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Student / Admin</th>
+          <th>Student ID</th>
+          <th>Email Address</th>
+          <th>Campus Block</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th class="text-end">Account Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <strong class="text-navy d-block">{{ u.full_name }}</strong>
+            <small class="text-muted">Joined {{ u.created_at.strftime('%d %b %Y') }}</small>
+          </td>
+          <td><code>{{ u.student_id }}</code></td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.campus_block or 'Hostel' }}</td>
+          <td>
+            {% if u.is_admin %}
+              <span class="badge bg-warning text-dark"><i class="bi bi-shield-lock me-1"></i>Admin</span>
+            {% else %}
+              <span class="badge bg-light text-primary border"><i class="bi bi-mortarboard me-1"></i>Student</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if u.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-danger">Deactivated</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            {% if u.id != current_user.id %}
+            <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=u.id) }}" class="d-inline" onsubmit="return confirm('Change active status for this user?');">
+              <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                {% if u.is_active %}
+                  <i class="bi bi-slash-circle me-1"></i> Deactivate
+                {% else %}
+                  <i class="bi bi-check2-circle me-1"></i> Activate
+                {% endif %}
+              </button>
+            </form>
+            {% else %}
+            <span class="text-muted small">Current User</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

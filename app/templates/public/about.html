@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}About - Campus Marketplace E-Commerce ERP System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Header -->
+  <div class="text-center max-w-800 mx-auto mb-5">
+    <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-2">Project Architecture</span>
+    <h1 class="display-5 fw-bold text-navy">About Campus Marketplace ERP</h1>
+    <p class="lead text-muted">An academic capstone system demonstrating tight coupling between student e-commerce transactions and university enterprise resource planning.</p>
+  </div>
+
+  <!-- Key Architecture Modules -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card card-custom p-4 h-100">
+        <div class="kpi-icon-box bg-primary text-white mb-3">
+          <i class="bi bi-cart-check fs-2"></i>
+        </div>
+        <h4 class="fw-bold">Peer-to-Peer E-Commerce</h4>
+        <p class="text-muted small">
+          Enables university students to buy, sell, exchange and review pre-owned textbooks, lab kits, laptops, calculators, and hostel essentials without third-party fees.
+        </p>
+        <ul class="text-muted small ps-3">
+          <li>Verified campus email identification</li>
+          <li>Real-time search, category filtering & sorting</li>
+          <li>Stock-aware shopping cart & atomic checkout</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card card-custom p-4 h-100">
+        <div class="kpi-icon-box bg-teal text-white mb-3" style="background-color: var(--secondary-teal);">
+          <i class="bi bi-diagram-3 fs-2"></i>
+        </div>
+        <h4 class="fw-bold">Integrated ERP Core</h4>
+        <p class="text-muted small">
+          Directly coordinates inventory states, financial audit trails, and student dispute resolution across a centralized relational database.
+        </p>
+        <ul class="text-muted small ps-3">
+          <li>Automated inventory decrements & stock health</li>
+          <li>Low-stock alerts & admin replenishment controls</li>
+          <li>Centralized complaint ticketing & resolution</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card card-custom p-4 h-100">
+        <div class="kpi-icon-box bg-dark text-warning mb-3">
+          <i class="bi bi-graph-up-arrow fs-2"></i>
+        </div>
+        <h4 class="fw-bold">Dynamic Analytics</h4>
+        <p class="text-muted small">
+          Visualizes real-time marketplace demand, monthly sales patterns, and product category trends using interactive Chart.js visualizations.
+        </p>
+        <ul class="text-muted small ps-3">
+          <li>Monthly sales volume & revenue trajectories</li>
+          <li>Product category distribution analysis</li>
+          <li>Top-selling products and active seller rankings</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety & Campus Rules -->
+  <div class="card card-custom p-4 p-md-5 mb-5 bg-white">
+    <h3 class="fw-bold text-navy mb-3"><i class="bi bi-shield-shaded text-teal me-2" style="color: var(--secondary-teal);"></i>Campus Trading & Safety Guidelines</h3>
+    <div class="row g-4 mt-2">
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-primary fs-3"><i class="bi bi-geo-alt"></i></div>
+          <div>
+            <h6 class="fw-bold">Official Campus Meeting Points</h6>
+            <p class="text-muted small">Always schedule your handovers at well-lit, populated campus hubs such as the Central Library Ground Floor, Student Activity Center, or Department Lounges.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-success fs-3"><i class="bi bi-check2-circle"></i></div>
+          <div>
+            <h6 class="fw-bold">Inspect Before Completing</h6>
+            <p class="text-muted small">Inspect electronic devices, book editions, and hardware thoroughly prior to releasing payment or accepting completion.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-warning fs-3"><i class="bi bi-chat-dots"></i></div>
+          <div>
+            <h6 class="fw-bold">Simulated Academic Payment</h6>
+            <p class="text-muted small">All transaction figures on this platform are simulated for demonstration purposes and academic evaluation.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-danger fs-3"><i class="bi bi-flag"></i></div>
+          <div>
+            <h6 class="fw-bold">Dispute Resolution</h6>
+            <p class="text-muted small">If an item does not match its listing description, file a ticket under "My Complaints" for administrative investigation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

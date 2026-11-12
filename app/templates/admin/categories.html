@@ -1,0 +1,109 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}ERP Category Management - Campus Marketplace{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <span class="badge bg-primary px-3 py-1 mb-1">Taxonomy</span>
+    <h3 class="fw-bold text-navy mb-0">Category Management</h3>
+    <p class="text-muted small mb-0">Define, edit and organize product classification categories across the campus marketplace.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Left Column: Add New Category Form -->
+  <div class="col-lg-4">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+      <h5 class="fw-bold text-navy mb-3"><i class="bi bi-folder-plus text-primary me-2"></i>Create New Category</h5>
+
+      <form method="POST" action="{{ url_for('admin.categories') }}">
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="name">Category Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Lab Equipment" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="icon">Bootstrap Icon Class</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            <input type="text" class="form-control" id="icon" name="icon" value="bi-tag" placeholder="bi-laptop, bi-book, bi-lamp">
+          </div>
+          <small class="text-muted">Icons: bi-book, bi-laptop, bi-pencil, bi-house, bi-tools, etc.</small>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="description">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief explanation of items in this category..."></textarea>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-navy">
+            <i class="bi bi-plus-circle me-1"></i> Add Category
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Column: Existing Categories Table -->
+  <div class="col-lg-8">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+      <h5 class="fw-bold text-navy mb-3">Active Campus Categories ({{ categories|length }})</h5>
+
+      <div class="table-responsive">
+        <table class="table align-middle table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Icon</th>
+              <th>Category Name</th>
+              <th>Slug</th>
+              <th>Products Listed</th>
+              <th>Status</th>
+              <th class="text-end">Visibility</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            <tr>
+              <td style="width: 50px;">
+                <div class="kpi-icon-box bg-light text-primary border" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                  <i class="bi {{ cat.icon }}"></i>
+                </div>
+              </td>
+              <td>
+                <strong class="text-navy">{{ cat.name }}</strong>
+                {% if cat.description %}
+                <small class="text-muted d-block">{{ cat.description }}</small>
+                {% endif %}
+              </td>
+              <td><code>{{ cat.slug }}</code></td>
+              <td>
+                <span class="badge bg-secondary-subtle text-dark">{{ cat.products.count() }} products</span>
+              </td>
+              <td>
+                {% if cat.is_active %}
+                  <span class="badge bg-success">Visible</span>
+                {% else %}
+                  <span class="badge bg-secondary">Hidden</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <form method="POST" action="{{ url_for('admin.toggle_category', category_id=cat.id) }}" class="d-inline">
+                  <button type="submit" class="btn btn-sm {% if cat.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" title="Toggle Category Visibility">
+                    {% if cat.is_active %}
+                      <i class="bi bi-eye-slash"></i> Hide
+                    {% else %}
+                      <i class="bi bi-eye"></i> Show
+                    {% endif %}
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

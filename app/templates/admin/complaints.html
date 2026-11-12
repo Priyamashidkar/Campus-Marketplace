@@ -1,0 +1,130 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}ERP Dispute Resolution - Campus Marketplace{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <span class="badge bg-danger px-3 py-1 mb-1">Dispute Resolution</span>
+    <h3 class="fw-bold text-navy mb-0">Complaint & Dispute Ticket Center</h3>
+    <p class="text-muted small mb-0">Investigate student grievances, mediate transaction issues, and log resolutions.</p>
+  </div>
+  <div>
+    <div class="btn-group btn-group-sm">
+      <a href="{{ url_for('admin.complaints') }}" class="btn {% if status_filter == 'all' %}btn-navy{% else %}btn-outline-navy{% endif %}">All</a>
+      <a href="{{ url_for('admin.complaints', status='Pending') }}" class="btn {% if status_filter == 'Pending' %}btn-warning text-dark{% else %}btn-outline-warning text-dark{% endif %}">Pending</a>
+      <a href="{{ url_for('admin.complaints', status='Under Review') }}" class="btn {% if status_filter == 'Under Review' %}btn-info text-dark{% else %}btn-outline-info text-dark{% endif %}">Under Review</a>
+      <a href="{{ url_for('admin.complaints', status='Resolved') }}" class="btn {% if status_filter == 'Resolved' %}btn-success{% else %}btn-outline-success{% endif %}">Resolved</a>
+    </div>
+  </div>
+</div>
+
+<div class="card card-custom p-4 border-0 bg-white shadow-sm">
+  {% if complaints %}
+  <div class="table-responsive">
+    <table class="table align-middle table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Ticket Ref</th>
+          <th>Date Filed</th>
+          <th>Student Complainant</th>
+          <th>Subject</th>
+          <th>Linked Order</th>
+          <th>Status</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for comp in complaints %}
+        <tr>
+          <td><strong class="text-navy"><code>{{ comp.ticket_number }}</code></strong></td>
+          <td><small class="text-muted">{{ comp.created_at.strftime('%d %b %Y') }}</small></td>
+          <td>
+            <span class="fw-semibold">{{ comp.student.full_name }}</span><br>
+            <small class="text-muted"><code>{{ comp.student.student_id }}</code></small>
+          </td>
+          <td>
+            <span class="fw-semibold text-dark">{{ comp.subject }}</span>
+          </td>
+          <td>
+            {% if comp.order %}
+            <a href="{{ url_for('student.order_tracking', order_number=comp.order.order_number) }}" class="small" target="_blank">
+              {{ comp.order.order_number }}
+            </a>
+            {% else %}
+            <span class="text-muted small">None</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge {{ comp.status_badge_class }}">{{ comp.status }}</span>
+          </td>
+          <td class="text-end">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#resolveModal{{ comp.id }}">
+              <i class="bi bi-pencil-square me-1"></i> Review & Resolve
+            </button>
+          </td>
+        </tr>
+
+        <!-- Resolve Complaint Modal -->
+        <div class="modal fade" id="resolveModal{{ comp.id }}" tabindex="-1" aria-labelledby="resolveModalLabel{{ comp.id }}" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <form method="POST" action="{{ url_for('admin.complaints') }}">
+                <div class="modal-header">
+                  <h5 class="modal-title fw-bold" id="resolveModalLabel{{ comp.id }}">Investigate Ticket: {{ comp.ticket_number }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" name="complaint_id" value="{{ comp.id }}">
+
+                  <div class="p-3 bg-light rounded border mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                      <strong>Complainant:</strong> {{ comp.student.full_name }} ({{ comp.student.student_id }} - {{ comp.student.email }})
+                      <span class="text-muted">{{ comp.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                    </div>
+                    <strong>Subject:</strong> {{ comp.subject }}<br>
+                    {% if comp.order %}
+                    <strong>Referenced Order:</strong> {{ comp.order.order_number }} (Total: ₹{{ comp.order.total_amount }}, Seller: {{ comp.order.seller.student_id }})<br>
+                    {% endif %}
+                    <hr class="my-2">
+                    <strong>Student Grievance Description:</strong>
+                    <p class="mt-1 mb-0 text-dark small" style="white-space: pre-line;">{{ comp.description }}</p>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Update Ticket Status</label>
+                    <select class="form-select" name="status" required>
+                      <option value="Pending" {% if comp.status == 'Pending' %}selected{% endif %}>Pending</option>
+                      <option value="Under Review" {% if comp.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                      <option value="Resolved" {% if comp.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                      <option value="Rejected" {% if comp.status == 'Rejected' %}selected{% endif %}>Rejected / Dismissed</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Official Administrator Resolution Notes</label>
+                    <textarea class="form-control" name="admin_notes" rows="4" placeholder="Enter findings, resolution actions, or mediator instructions for the student..." required>{{ comp.admin_notes or '' }}</textarea>
+                    <small class="text-muted">This response will be visible to the student in their dispute ticket history.</small>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-success btn-sm fw-bold">Save Resolution</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-shield-check fs-1 text-success d-block mb-3"></i>
+    <h5 class="fw-bold text-dark">No complaints matching filter</h5>
+    <p class="text-muted mb-0">All student marketplace disputes have been addressed.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Track Order {{ order.order_number }} - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('student.my_orders') }}" class="text-decoration-none">My Orders</a></li>
+      <li class="breadcrumb-item active">{{ order.order_number }}</li>
+    </ol>
+  </nav>
+
+  <div class="card card-custom p-4 p-md-5 border-0 bg-white shadow-sm mb-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center pb-4 border-bottom gap-3">
+      <div>
+        <span class="text-muted small d-block">Order Tracking</span>
+        <h3 class="fw-bold text-navy mb-0">{{ order.order_number }}</h3>
+        <small class="text-muted"><i class="bi bi-clock me-1"></i>Placed on {{ order.created_at.strftime('%A, %d %B %Y at %I:%M %p') }}</small>
+      </div>
+      <div>
+        <span class="badge {{ order.status_badge_class }} fs-5 px-3 py-2">{{ order.status }}</span>
+      </div>
+    </div>
+
+    <!-- Stepper Timeline -->
+    {% if order.status in ['Cancelled', 'Rejected'] %}
+    <div class="alert alert-danger my-5 p-4 text-center rounded-3">
+      <i class="bi bi-x-circle-fill fs-1 d-block mb-2"></i>
+      <h4 class="fw-bold">Order {{ order.status }}</h4>
+      <p class="mb-0">This order was {{ order.status.lower() }}. Inventory stock has been automatically replenished back into the marketplace ERP system.</p>
+    </div>
+    {% else %}
+    <div class="tracking-steps my-5 px-2 px-md-5">
+      <!-- Step 1: Placed -->
+      <div class="step-node {% if order.status in ['Pending', 'Accepted', 'Ready for Pickup', 'Completed'] %}completed{% endif %}">
+        <div class="step-circle">
+          <i class="bi bi-file-earmark-check"></i>
+        </div>
+        <strong class="d-block text-dark small">Order Placed</strong>
+        <span class="text-muted" style="font-size: 0.75rem;">Recorded in ERP</span>
+      </div>
+
+      <!-- Step 2: Accepted -->
+      <div class="step-node {% if order.status in ['Accepted', 'Ready for Pickup', 'Completed'] %}completed{% elif order.status == 'Pending' %}active{% endif %}">
+        <div class="step-circle">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+        <strong class="d-block text-dark small">Accepted</strong>
+        <span class="text-muted" style="font-size: 0.75rem;">Seller Confirmed</span>
+      </div>
+
+      <!-- Step 3: Ready for Pickup -->
+      <div class="step-node {% if order.status in ['Ready for Pickup', 'Completed'] %}completed{% elif order.status == 'Accepted' %}active{% endif %}">
+        <div class="step-circle">
+          <i class="bi bi-geo-alt"></i>
+        </div>
+        <strong class="d-block text-dark small">Ready for Pickup</strong>
+        <span class="text-muted" style="font-size: 0.75rem;">At Campus Hub</span>
+      </div>
+
+      <!-- Step 4: Completed -->
+      <div class="step-node {% if order.status == 'Completed' %}completed{% elif order.status == 'Ready for Pickup' %}active{% endif %}">
+        <div class="step-circle">
+          <i class="bi bi-hand-thumbs-up"></i>
+        </div>
+        <strong class="d-block text-dark small">Completed</strong>
+        <span class="text-muted" style="font-size: 0.75rem;">Handoff Done</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Pickup & Handover Details -->
+    <div class="row g-4 mt-2">
+      <div class="col-md-6">
+        <div class="card p-3 bg-light border h-100">
+          <h6 class="fw-bold text-navy mb-2"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Campus Pickup Point</h6>
+          <p class="fw-semibold text-dark mb-1">{{ order.pickup_location }}</p>
+          {% if order.notes %}
+          <div class="small text-muted mt-2">
+            <strong>Handover Notes:</strong> {{ order.notes }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card p-3 bg-light border h-100">
+          <h6 class="fw-bold text-navy mb-2"><i class="bi bi-people-fill text-primary me-2"></i>Campus Parties</h6>
+          <div class="small text-muted mb-1">
+            <strong>Buyer:</strong> {{ order.buyer.full_name }} ({{ order.buyer.student_id }})
+          </div>
+          <div class="small text-muted mb-1">
+            <strong>Seller:</strong> {{ order.seller.full_name }} ({{ order.seller.student_id }})
+          </div>
+          <div class="small text-muted">
+            <strong>Seller Hostel Block:</strong> {{ order.seller.campus_block or 'Hostel' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items in Order -->
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Product</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-end">Unit Price</th>
+            <th class="text-end">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items %}
+          <tr>
+            <td>
+              <a href="{{ url_for('student.product_detail', product_id=item.product.id) }}" class="fw-semibold text-navy text-decoration-none">
+                {{ item.product.title }}
+              </a>
+            </td>
+            <td class="text-center">{{ item.quantity }}</td>
+            <td class="text-end">₹{{ item.unit_price }}</td>
+            <td class="text-end fw-bold">₹{{ item.subtotal }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="text-end">Total Amount:</th>
+            <th class="text-end text-primary">₹{{ order.total_amount }}</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+      <a href="{{ url_for('student.my_orders') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Orders
+      </a>
+
+      {% if order.can_be_cancelled %}
+      <form method="POST" action="{{ url_for('student.cancel_order', order_id=order.id) }}" onsubmit="return confirm('Cancel this order?');">
+        <button type="submit" class="btn btn-danger btn-sm">
+          <i class="bi bi-x-circle me-1"></i> Cancel Order
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

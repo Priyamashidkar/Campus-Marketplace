@@ -1,0 +1,247 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}ERP Dashboard - Campus Marketplace{% endblock %}
+
+{% block admin_content %}
+<!-- Dashboard Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <span class="badge bg-warning text-dark px-3 py-1 mb-1">Campus ERP Core</span>
+    <h2 class="fw-bold text-navy mb-0">ERP Control Center & Analytics</h2>
+    <p class="text-muted small mb-0">Centralized operational oversight of campus marketplace inventory, orders, and students.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin.reports') }}" class="btn btn-navy btn-sm">
+      <i class="bi bi-file-earmark-text me-1"></i> Generate ERP Reports
+    </a>
+    <a href="{{ url_for('student.marketplace') }}" class="btn btn-outline-teal btn-sm" style="color: var(--secondary-teal); border-color: var(--secondary-teal);" target="_blank">
+      <i class="bi bi-shop me-1"></i> View Live Marketplace
+    </a>
+  </div>
+</div>
+
+<!-- 6 KPI Summary Cards -->
+<div class="row g-3 mb-4">
+  <!-- Total Students -->
+  <div class="col-sm-6 col-xl-2">
+    <div class="kpi-card h-100">
+      <div class="kpi-icon-box bg-primary-subtle text-primary">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <span class="text-muted small d-block">Students</span>
+        <h4 class="fw-bold text-dark mb-0">{{ kpis.total_students }}</h4>
+        <small class="text-success">{{ kpis.total_sellers }} Sellers</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Products -->
+  <div class="col-sm-6 col-xl-2">
+    <div class="kpi-card h-100">
+      <div class="kpi-icon-box bg-teal text-white" style="background-color: var(--secondary-teal);">
+        <i class="bi bi-box-seam-fill"></i>
+      </div>
+      <div>
+        <span class="text-muted small d-block">Products</span>
+        <h4 class="fw-bold text-dark mb-0">{{ kpis.total_products }}</h4>
+        <small class="text-muted">{{ kpis.active_products }} Active</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Orders -->
+  <div class="col-sm-6 col-xl-2">
+    <div class="kpi-card h-100">
+      <div class="kpi-icon-box bg-info-subtle text-info">
+        <i class="bi bi-cart-check-fill"></i>
+      </div>
+      <div>
+        <span class="text-muted small d-block">Total Orders</span>
+        <h4 class="fw-bold text-dark mb-0">{{ kpis.total_orders }}</h4>
+        <small class="text-success">{{ kpis.completed_orders }} Done</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Orders -->
+  <div class="col-sm-6 col-xl-2">
+    <div class="kpi-card h-100">
+      <div class="kpi-icon-box bg-warning-subtle text-warning">
+        <i class="bi bi-hourglass-split"></i>
+      </div>
+      <div>
+        <span class="text-muted small d-block">Pending Orders</span>
+        <h4 class="fw-bold text-warning mb-0">{{ kpis.pending_orders }}</h4>
+        <small class="text-muted">Awaiting handoff</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gross Transaction Volume -->
+  <div class="col-sm-6 col-xl-2">
+    <div class="kpi-card h-100">
+      <div class="kpi-icon-box bg-success-subtle text-success">
+        <i class="bi bi-currency-rupee"></i>
+      </div>
+      <div>
+        <span class="text-muted small d-block">Total Volume</span>
+        <h4 class="fw-bold text-primary mb-0">₹{{ kpis.total_transaction_value|round|int }}</h4>
+        <small class="text-muted">Simulated</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaints / Disputes -->
+  <div class="col-sm-6 col-xl-2">
+    <div class="kpi-card h-100">
+      <div class="kpi-icon-box bg-danger-subtle text-danger">
+        <i class="bi bi-shield-exclamation"></i>
+      </div>
+      <div>
+        <span class="text-muted small d-block">Open Tickets</span>
+        <h4 class="fw-bold text-danger mb-0">{{ kpis.pending_complaints }}</h4>
+        <small class="text-muted">of {{ kpis.total_complaints }} total</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Interactive Chart.js Visualizations -->
+<div class="row g-4 mb-4">
+  <!-- Monthly Trend Chart -->
+  <div class="col-lg-8">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-navy mb-0">
+          <i class="bi bi-graph-up text-primary me-2"></i>Monthly Marketplace Trends (Volume vs Revenue)
+        </h5>
+        <span class="badge bg-light text-dark border">Live ERP Sync</span>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="monthlyTrendsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Distribution Chart -->
+  <div class="col-lg-4">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-navy mb-0">
+          <i class="bi bi-pie-chart text-teal me-2" style="color: var(--secondary-teal);"></i>Category Distribution
+        </h5>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="categoryDistChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lower Section: Recent Orders & Alerts -->
+<div class="row g-4">
+  <!-- Recent Marketplace Orders -->
+  <div class="col-lg-7">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-navy mb-0">
+          <i class="bi bi-clock-history text-secondary me-2"></i>Recent Marketplace Orders
+        </h5>
+        <a href="{{ url_for('admin.orders') }}" class="btn btn-outline-navy btn-sm">
+          All Orders <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      {% if recent_orders %}
+      <div class="table-responsive">
+        <table class="table align-middle table-sm mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Order ID</th>
+              <th>Buyer</th>
+              <th>Seller</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ord in recent_orders %}
+            <tr>
+              <td><strong class="text-navy">{{ ord.order_number }}</strong></td>
+              <td><small>{{ ord.buyer.student_id }}</small></td>
+              <td><small>{{ ord.seller.student_id }}</small></td>
+              <td class="fw-semibold">₹{{ ord.total_amount }}</td>
+              <td><span class="badge {{ ord.status_badge_class }}">{{ ord.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted small py-4 text-center">No orders recorded yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Low Stock Alert & Recent Complaints -->
+  <div class="col-lg-5">
+    <!-- Low Stock Alert Card -->
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-danger mb-0">
+          <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Low-Stock Inventory Alerts
+        </h5>
+        <a href="{{ url_for('admin.inventory', filter='low_stock') }}" class="btn btn-outline-danger btn-sm">Manage</a>
+      </div>
+
+      {% if low_stock_items %}
+      <ul class="list-group list-group-flush">
+        {% for inv in low_stock_items %}
+        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="d-block text-dark small text-truncate" style="max-width: 200px;">{{ inv.product.title }}</strong>
+            <small class="text-muted">Threshold: {{ inv.low_stock_threshold }}</small>
+          </div>
+          <span class="badge {% if inv.stock_quantity <= 0 %}bg-danger{% else %}bg-warning text-dark{% endif %} fs-6">
+            {{ inv.stock_quantity }} left
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-success small mb-0"><i class="bi bi-check-circle me-1"></i>All inventory stock levels are healthy.</p>
+      {% endif %}
+    </div>
+
+    <!-- Recent Complaints Card -->
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-navy mb-0">
+          <i class="bi bi-shield-exclamation text-warning me-2"></i>Recent Dispute Tickets
+        </h5>
+        <a href="{{ url_for('admin.complaints') }}" class="btn btn-outline-navy btn-sm">Review All</a>
+      </div>
+
+      {% if recent_complaints %}
+      <ul class="list-group list-group-flush">
+        {% for comp in recent_complaints %}
+        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="d-block text-navy small">{{ comp.ticket_number }}</strong>
+            <small class="text-muted text-truncate d-inline-block" style="max-width: 180px;">{{ comp.subject }}</small>
+          </div>
+          <span class="badge {{ comp.status_badge_class }}">{{ comp.status }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-muted small mb-0"><i class="bi bi-check2-circle text-success me-1"></i>No pending student dispute tickets.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/erp_charts.js') }}"></script>
+{% endblock %}

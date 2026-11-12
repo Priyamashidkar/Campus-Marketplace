@@ -1,0 +1,259 @@
+:root {
+  --primary-navy: #1e3a8a;
+  --primary-navy-dark: #0f172a;
+  --secondary-teal: #0d9488;
+  --secondary-teal-hover: #0f766e;
+  --accent-cyan: #06b6d4;
+  --bg-light: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+}
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Navbar */
+.navbar-custom {
+  background: linear-gradient(135deg, var(--primary-navy-dark) 0%, var(--primary-navy) 100%);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.navbar-brand-badge {
+  background-color: var(--secondary-teal);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+/* Cards & Components */
+.card-custom {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-custom:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+}
+
+.card-dashboard {
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Buttons */
+.btn-navy {
+  background-color: var(--primary-navy);
+  color: #ffffff;
+  border: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.btn-navy:hover {
+  background-color: #172554;
+  color: #ffffff;
+}
+
+.btn-teal {
+  background-color: var(--secondary-teal);
+  color: #ffffff;
+  border: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.btn-teal:hover {
+  background-color: var(--secondary-teal-hover);
+  color: #ffffff;
+}
+
+.btn-outline-navy {
+  color: var(--primary-navy);
+  border-color: var(--primary-navy);
+  border-radius: 8px;
+}
+
+.btn-outline-navy:hover {
+  background-color: var(--primary-navy);
+  color: #ffffff;
+}
+
+/* Product Card Styling */
+.product-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-img-wrapper {
+  height: 190px;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  position: relative;
+}
+
+.product-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.product-card:hover .product-img-wrapper img {
+  transform: scale(1.04);
+}
+
+.condition-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+/* ERP Sidebar */
+.erp-sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid var(--border-color);
+  min-height: calc(100vh - 72px);
+}
+
+.erp-nav-link {
+  color: var(--text-dark);
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.15s;
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+}
+
+.erp-nav-link:hover {
+  background-color: #f1f5f9;
+  color: var(--primary-navy);
+}
+
+.erp-nav-link.active {
+  background-color: #e0f2fe;
+  color: var(--primary-navy);
+  font-weight: 600;
+  border-left: 4px solid var(--primary-navy);
+}
+
+/* Metric / KPI Cards */
+.kpi-card {
+  border-radius: 12px;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.kpi-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Stepper for Order Tracking */
+.tracking-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 2rem 0;
+}
+
+.tracking-steps::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.step-node {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 1;
+}
+
+.step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  font-size: 1.1rem;
+  color: #64748b;
+  transition: all 0.3s;
+}
+
+.step-node.completed .step-circle {
+  background: var(--secondary-teal);
+  border-color: var(--secondary-teal);
+  color: #ffffff;
+}
+
+.step-node.active .step-circle {
+  background: var(--primary-navy);
+  border-color: var(--primary-navy);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.2);
+}
+
+/* Simulated Transaction Stamp */
+.simulated-stamp {
+  border: 2px dashed #94a3b8;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  font-size: 0.85rem;
+  color: #475569;
+}

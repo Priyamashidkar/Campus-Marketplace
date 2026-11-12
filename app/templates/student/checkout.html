@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Checkout - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-bag-check text-navy fs-3"></i>
+    <h3 class="fw-bold text-navy mb-0">Checkout & Campus Handover</h3>
+  </div>
+
+  <form method="POST" action="{{ url_for('student.checkout') }}">
+    <div class="row g-4">
+      <!-- Left Column: Pickup Location & Payment Options -->
+      <div class="col-lg-7">
+        <!-- Pickup Location Card -->
+        <div class="card card-custom p-4 mb-4 border-0 bg-white">
+          <h5 class="fw-bold text-navy mb-3">
+            <i class="bi bi-geo-alt-fill text-danger me-2"></i>1. Select Campus Pickup Location
+          </h5>
+          <p class="text-muted small">Choose a designated public location on campus for item inspection and handover.</p>
+
+          <div class="mb-3">
+            {% for pt in pickup_points %}
+            <div class="form-check p-3 border rounded-3 mb-2 bg-light">
+              <input class="form-check-input ms-0 me-2" type="radio" name="pickup_location" id="pt_{{ loop.index }}" value="{{ pt }}" {% if loop.first %}checked{% endif %}>
+              <label class="form-check-label fw-semibold text-dark cursor-pointer" for="pt_{{ loop.index }}">
+                {{ pt }}
+              </label>
+            </div>
+            {% endfor %}
+
+            <!-- Custom Location Option -->
+            <div class="form-check p-3 border rounded-3 bg-light">
+              <input class="form-check-input ms-0 me-2" type="radio" name="pickup_location" id="pt_custom" value="Custom">
+              <label class="form-check-label fw-semibold text-dark cursor-pointer" for="pt_custom">
+                Specify Custom Meeting Point on Campus
+              </label>
+              <input type="text" class="form-control form-control-sm mt-2" name="custom_location" placeholder="e.g. Mechanical Lab Ground Floor Corridors">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark" for="notes">Delivery / Handover Note for Seller</label>
+            <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="e.g. I am available between 4:00 PM and 6:00 PM near the library lawn."></textarea>
+          </div>
+        </div>
+
+        <!-- Payment Method Card -->
+        <div class="card card-custom p-4 border-0 bg-white">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-navy mb-0">
+              <i class="bi bi-credit-card-2-front-fill text-primary me-2"></i>2. Payment Method
+            </h5>
+            <span class="badge bg-warning text-dark border">
+              <i class="bi bi-info-circle me-1"></i> Academic Demo Simulation
+            </span>
+          </div>
+
+          <div class="alert alert-info py-2 small mb-3">
+            <i class="bi bi-shield-check me-1"></i> Transactions are securely audited and tracked in the central university ERP database.
+          </div>
+
+          {% for method_name, method_desc in payment_options %}
+          <div class="form-check p-3 border rounded-3 mb-2 bg-light">
+            <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_{{ loop.index }}" value="{{ method_name }}" {% if loop.first %}checked{% endif %}>
+            <label class="form-check-label cursor-pointer" for="pay_{{ loop.index }}">
+              <strong class="d-block text-dark">{{ method_name }}</strong>
+              <small class="text-muted">{{ method_desc }}</small>
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right Column: Cart Review & Submit -->
+      <div class="col-lg-5">
+        <div class="card card-custom p-4 border-0 bg-white sticky-top" style="top: 85px;">
+          <h5 class="fw-bold text-navy mb-3">Items in This Order</h5>
+
+          <ul class="list-group list-group-flush mb-3">
+            {% for item in cart.items %}
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-secondary rounded-pill">{{ item.quantity }}x</span>
+                <div>
+                  <span class="fw-semibold text-dark text-truncate d-inline-block" style="max-width: 200px;">{{ item.product.title }}</span>
+                  <small class="text-muted d-block">Seller: {{ item.product.seller.student_id }}</small>
+                </div>
+              </div>
+              <span class="fw-bold text-primary">₹{{ item.subtotal }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <hr class="my-2">
+
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span class="fw-semibold">₹{{ cart.total_amount }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Campus Service Charge</span>
+            <span class="text-success fw-bold">FREE (₹0)</span>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4 pt-2 border-top">
+            <span class="fs-5 fw-bold text-dark">Total Amount</span>
+            <span class="fs-4 fw-bold text-primary">₹{{ cart.total_amount }}</span>
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-teal btn-lg fw-bold">
+              <i class="bi bi-check-circle-fill me-1"></i> Confirm & Place Order
+            </button>
+          </div>
+
+          <a href="{{ url_for('student.view_cart') }}" class="btn btn-outline-secondary btn-sm text-center">
+            <i class="bi bi-arrow-left me-1"></i> Return to Shopping Cart
+          </a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

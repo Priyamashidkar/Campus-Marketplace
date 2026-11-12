@@ -1,0 +1,166 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}ERP Order Orchestration - Campus Marketplace{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <span class="badge bg-info text-dark px-3 py-1 mb-1">Fulfillment Orchestration</span>
+    <h3 class="fw-bold text-navy mb-0">Global Campus Marketplace Orders</h3>
+    <p class="text-muted small mb-0">Full visibility and supervisory control over all campus trade handovers.</p>
+  </div>
+</div>
+
+<!-- Search & Status Filter -->
+<div class="card card-custom p-3 mb-4 border-0 bg-white shadow-sm">
+  <form method="GET" action="{{ url_for('admin.orders') }}">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="Search by order reference or pickup spot...">
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <select class="form-select" name="status">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Order Statuses</option>
+          <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+          <option value="Accepted" {% if status_filter == 'Accepted' %}selected{% endif %}>Accepted</option>
+          <option value="Ready for Pickup" {% if status_filter == 'Ready for Pickup' %}selected{% endif %}>Ready for Pickup</option>
+          <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+          <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+          <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-navy">Filter Orders</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Orders Table -->
+<div class="card card-custom p-4 border-0 bg-white shadow-sm">
+  <div class="table-responsive">
+    <table class="table align-middle table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Order Number</th>
+          <th>Date</th>
+          <th>Buyer</th>
+          <th>Seller</th>
+          <th>Pickup Location</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th class="text-end">ERP Override</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ord in orders %}
+        <tr>
+          <td><strong class="text-navy">{{ ord.order_number }}</strong></td>
+          <td><small class="text-muted">{{ ord.created_at.strftime('%d %b %Y, %I:%M %p') }}</small></td>
+          <td>
+            <span class="fw-semibold">{{ ord.buyer.full_name }}</span><br>
+            <small class="text-muted"><code>{{ ord.buyer.student_id }}</code></small>
+          </td>
+          <td>
+            <span class="fw-semibold">{{ ord.seller.full_name }}</span><br>
+            <small class="text-muted"><code>{{ ord.seller.student_id }}</code></small>
+          </td>
+          <td>
+            <small class="text-dark d-block text-truncate" style="max-width: 180px;">{{ ord.pickup_location }}</small>
+          </td>
+          <td class="fw-bold text-primary">₹{{ ord.total_amount }}</td>
+          <td>
+            <span class="badge {{ ord.status_badge_class }}">{{ ord.status }}</span>
+          </td>
+          <td class="text-end">
+            <!-- Modal trigger for order details & status change -->
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#adminOrderModal{{ ord.id }}">
+              <i class="bi bi-gear-fill"></i>
+            </button>
+          </td>
+        </tr>
+
+        <!-- Admin Order Detail & Override Modal -->
+        <div class="modal fade" id="adminOrderModal{{ ord.id }}" tabindex="-1" aria-labelledby="adminOrderModalLabel{{ ord.id }}" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="adminOrderModalLabel{{ ord.id }}">Order Audit: {{ ord.order_number }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded border">
+                      <strong>Buyer:</strong> {{ ord.buyer.full_name }} ({{ ord.buyer.student_id }})<br>
+                      <strong>Email:</strong> {{ ord.buyer.email }}<br>
+                      <strong>Block:</strong> {{ ord.buyer.campus_block or 'Hostel' }}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded border">
+                      <strong>Seller:</strong> {{ ord.seller.full_name }} ({{ ord.seller.student_id }})<br>
+                      <strong>Email:</strong> {{ ord.seller.email }}<br>
+                      <strong>Block:</strong> {{ ord.seller.campus_block or 'Hostel' }}
+                    </div>
+                  </div>
+                </div>
+
+                <h6 class="fw-bold">Line Items:</h6>
+                <table class="table table-sm table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th class="text-center">Qty</th>
+                      <th class="text-end">Unit Price</th>
+                      <th class="text-end">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for it in ord.items %}
+                    <tr>
+                      <td>{{ it.product.title }}</td>
+                      <td class="text-center">{{ it.quantity }}</td>
+                      <td class="text-end">₹{{ it.unit_price }}</td>
+                      <td class="text-end fw-bold">₹{{ it.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+                <!-- Status Override Form -->
+                {% if ord.status != 'Completed' %}
+                <form method="POST" action="{{ url_for('admin.update_order_status', order_id=ord.id) }}" class="mt-4 pt-3 border-top">
+                  <h6 class="fw-bold text-danger">Administrative Status Override:</h6>
+                  <div class="input-group">
+                    <select class="form-select" name="status">
+                      <option value="Accepted" {% if ord.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                      <option value="Ready for Pickup" {% if ord.status == 'Ready for Pickup' %}selected{% endif %}>Ready for Pickup</option>
+                      <option value="Completed">Completed (Finalize)</option>
+                      <option value="Cancelled">Cancelled (Restore Stock)</option>
+                    </select>
+                    <button type="submit" class="btn btn-warning fw-bold text-dark">Apply Status Change</button>
+                  </div>
+                  <small class="text-muted">Cancelling automatically restores reserved inventory stock back to the seller.</small>
+                </form>
+                {% else %}
+                <div class="alert alert-success mt-3 mb-0 small">
+                  <i class="bi bi-check-circle-fill me-1"></i> This order was finalized as Completed and settled.
+                </div>
+                {% endif %}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

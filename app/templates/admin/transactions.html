@@ -1,0 +1,111 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}ERP Financial Audit Log - Campus Marketplace{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <span class="badge bg-success px-3 py-1 mb-1">Financial Oversight</span>
+    <h3 class="fw-bold text-navy mb-0">ERP Financial & Transaction Log</h3>
+    <p class="text-muted small mb-0">Centralized audit trail of simulated student payments and campus handovers.</p>
+  </div>
+  <div>
+    <span class="badge bg-warning text-dark border px-3 py-2 fs-6">
+      <i class="bi bi-info-circle me-1"></i> Simulated College Project Environment
+    </span>
+  </div>
+</div>
+
+<!-- Financial Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+      <span class="text-muted small d-block">Gross Recorded Transaction Volume</span>
+      <h2 class="display-6 fw-bold text-primary mb-0">₹{{ total_val }}</h2>
+      <small class="text-muted">Total recorded payment flow across {{ transactions|length }} transactions</small>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+      <span class="text-muted small d-block">Supported Campus Payment Modes</span>
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <span class="badge bg-light text-primary border py-2 px-3">Campus UPI (GPay/PhonePe)</span>
+        <span class="badge bg-light text-success border py-2 px-3">Cash on Campus Pickup</span>
+        <span class="badge bg-light text-info border py-2 px-3">Campus SmartCard</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters Bar -->
+<div class="card card-custom p-3 mb-4 border-0 bg-white shadow-sm">
+  <form method="GET" action="{{ url_for('admin.transactions') }}">
+    <div class="row g-2 align-items-center">
+      <div class="col-sm-6 col-md-5">
+        <select class="form-select" name="payment_status">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Payment Statuses</option>
+          <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+          <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+          <option value="Refunded" {% if status_filter == 'Refunded' %}selected{% endif %}>Refunded</option>
+        </select>
+      </div>
+      <div class="col-sm-6 col-md-5">
+        <select class="form-select" name="payment_method">
+          <option value="all" {% if method_filter == 'all' %}selected{% endif %}>All Payment Methods</option>
+          <option value="Campus UPI" {% if method_filter == 'Campus UPI' %}selected{% endif %}>Campus UPI</option>
+          <option value="Cash on Pickup" {% if method_filter == 'Cash on Pickup' %}selected{% endif %}>Cash on Pickup</option>
+          <option value="Campus Card" {% if method_filter == 'Campus Card' %}selected{% endif %}>Campus Card</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-navy">Filter</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Transactions Table -->
+<div class="card card-custom p-4 border-0 bg-white shadow-sm">
+  <div class="table-responsive">
+    <table class="table align-middle table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Transaction Ref</th>
+          <th>Order Number</th>
+          <th>Date & Time</th>
+          <th>Buyer</th>
+          <th>Seller</th>
+          <th>Method</th>
+          <th>Amount</th>
+          <th>Payment Status</th>
+          <th class="text-center">Mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn in transactions %}
+        <tr>
+          <td><strong class="text-navy"><code>{{ txn.transaction_number }}</code></strong></td>
+          <td>
+            <a href="{{ url_for('student.order_tracking', order_number=txn.order.order_number) }}" class="text-decoration-none fw-semibold">
+              {{ txn.order.order_number }}
+            </a>
+          </td>
+          <td><small class="text-muted">{{ txn.transaction_date.strftime('%d %b %Y, %I:%M %p') }}</small></td>
+          <td><small><code>{{ txn.buyer.student_id }}</code></small></td>
+          <td><small><code>{{ txn.seller.student_id }}</code></small></td>
+          <td>
+            <span class="badge bg-light text-dark border">{{ txn.payment_method }}</span>
+          </td>
+          <td class="fw-bold text-primary">₹{{ txn.amount }}</td>
+          <td>
+            <span class="badge {{ txn.status_badge_class }}">{{ txn.payment_status }}</span>
+          </td>
+          <td class="text-center">
+            <span class="badge bg-secondary-subtle text-muted" style="font-size: 0.7rem;">Simulated</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

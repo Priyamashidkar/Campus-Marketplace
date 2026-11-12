@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Student Login - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card card-custom p-4 shadow-sm border-0">
+        <div class="text-center mb-4">
+          <div class="kpi-icon-box bg-primary text-white mx-auto mb-3" style="width: 60px; height: 60px;">
+            <i class="bi bi-mortarboard fs-2"></i>
+          </div>
+          <h3 class="fw-bold text-navy">Student Portal Login</h3>
+          <p class="text-muted small">Access your campus marketplace buyer & seller dashboard</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="email">University Email</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input type="email" class="form-control" id="email" name="email" placeholder="name@campus.edu" required autofocus>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label fw-semibold" for="password">Password</label>
+            </div>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+          </div>
+
+          <div class="mb-4 form-check">
+            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+            <label class="form-check-label text-muted small" for="remember">Remember my session</label>
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-navy py-2 fw-semibold">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Log In to Campus Marketplace
+            </button>
+          </div>
+        </form>
+
+        <div class="border-top pt-3 text-center text-muted small">
+          <p class="mb-1">Don't have an account yet? <a href="{{ url_for('auth.register') }}" class="text-teal fw-semibold">Register here</a></p>
+          <p class="mb-0">Are you a system administrator? <a href="{{ url_for('auth.admin_login') }}" class="text-primary fw-semibold">ERP Admin Login</a></p>
+        </div>
+
+        <!-- Academic Demo Credentials Box -->
+        <div class="mt-4 p-3 bg-light rounded border border-info-subtle small">
+          <div class="d-flex align-items-center gap-2 text-primary fw-bold mb-1">
+            <i class="bi bi-info-circle-fill"></i> Demo Student Accounts:
+          </div>
+          <ul class="list-unstyled mb-0 text-muted" style="font-size: 0.8rem;">
+            <li><strong>Student 1:</strong> <code>student1@campus.edu</code> | Pass: <code>Student@123</code></li>
+            <li><strong>Student 2:</strong> <code>student2@campus.edu</code> | Pass: <code>Student@123</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
