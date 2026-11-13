@@ -1,5 +1,6 @@
 /**
  * erp_charts.js - Live ERP Charts for Admin Dashboard and Reports
+ * Styled for consistent Dark Theme readability and high contrast.
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -9,6 +10,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!trendsCanvas && !categoryCanvas && !inventoryCanvas) {
     return;
+  }
+
+  // Set global Chart.js defaults for dark theme
+  if (typeof Chart !== "undefined") {
+    Chart.defaults.color = "#AAB4C3";
+    Chart.defaults.borderColor = "#303B4B";
+    Chart.defaults.plugins.tooltip.backgroundColor = "#1C2330";
+    Chart.defaults.plugins.tooltip.titleColor = "#F1F5F9";
+    Chart.defaults.plugins.tooltip.bodyColor = "#AAB4C3";
+    Chart.defaults.plugins.tooltip.borderColor = "#303B4B";
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.legend.labels.color = "#F1F5F9";
   }
 
   fetch("/admin/api/chart-data")
@@ -27,8 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
               {
                 label: "Order Volume",
                 data: data.monthly_trends.order_counts,
-                borderColor: "#1e3a8a",
-                backgroundColor: "rgba(30, 58, 138, 0.1)",
+                borderColor: "#3B82F6",
+                backgroundColor: "rgba(59, 130, 246, 0.15)",
+                pointBackgroundColor: "#3B82F6",
                 tension: 0.3,
                 fill: true,
                 yAxisID: "yOrders",
@@ -36,8 +50,9 @@ document.addEventListener("DOMContentLoaded", function () {
               {
                 label: "Sales Value (₹)",
                 data: data.monthly_trends.sales_values,
-                borderColor: "#0d9488",
+                borderColor: "#14B8A6",
                 backgroundColor: "transparent",
+                pointBackgroundColor: "#14B8A6",
                 borderDash: [5, 5],
                 tension: 0.3,
                 yAxisID: "ySales",
@@ -48,18 +63,30 @@ document.addEventListener("DOMContentLoaded", function () {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
+              x: {
+                grid: { color: "#303B4B" },
+                ticks: { color: "#AAB4C3" },
+              },
               yOrders: {
                 type: "linear",
                 position: "left",
                 beginAtZero: true,
-                title: { display: true, text: "Orders Count" },
+                grid: { color: "#303B4B" },
+                ticks: { color: "#AAB4C3" },
+                title: { display: true, text: "Orders Count", color: "#F1F5F9" },
               },
               ySales: {
                 type: "linear",
                 position: "right",
                 beginAtZero: true,
                 grid: { drawOnChartArea: false },
-                title: { display: true, text: "Sales (₹)" },
+                ticks: { color: "#AAB4C3" },
+                title: { display: true, text: "Sales (₹)", color: "#F1F5F9" },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: { color: "#F1F5F9" },
               },
             },
           },
@@ -75,15 +102,17 @@ document.addEventListener("DOMContentLoaded", function () {
             datasets: [
               {
                 data: data.category_distribution.product_counts,
+                borderColor: "#1C2330",
+                borderWidth: 2,
                 backgroundColor: [
-                  "#1e3a8a",
-                  "#0d9488",
-                  "#f59e0b",
-                  "#8b5cf6",
-                  "#ec4899",
-                  "#06b6d4",
-                  "#64748b",
-                  "#10b981",
+                  "#3B82F6",
+                  "#14B8A6",
+                  "#F59E0B",
+                  "#8B5CF6",
+                  "#EC4899",
+                  "#06B6D4",
+                  "#64748B",
+                  "#22C55E",
                 ],
               },
             ],
@@ -92,7 +121,10 @@ document.addEventListener("DOMContentLoaded", function () {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { position: "bottom" },
+              legend: {
+                position: "bottom",
+                labels: { color: "#F1F5F9" },
+              },
             },
           },
         });
@@ -109,6 +141,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 label: "Inventory Units",
                 data: data.inventory_health.data,
                 backgroundColor: data.inventory_health.colors,
+                borderColor: "#303B4B",
+                borderWidth: 1,
                 borderRadius: 6,
               },
             ],
@@ -117,7 +151,20 @@ document.addEventListener("DOMContentLoaded", function () {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-              y: { beginAtZero: true, ticks: { precision: 0 } },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#AAB4C3" },
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: "#303B4B" },
+                ticks: { color: "#AAB4C3", precision: 0 },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: { color: "#F1F5F9" },
+              },
             },
           },
         });
