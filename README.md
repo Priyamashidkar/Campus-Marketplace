@@ -237,3 +237,33 @@ For an effective viva/evaluation presentation, follow this sequence:
 - **Race Condition Prevention**: Atomic transactions with row-level locks protect inventory decrements during concurrent student checkouts.
 - **Role Isolation**: Strict custom decorators (`@admin_required`, `@student_required`) protect ERP administrative views and seller features.
 - **File Upload Protection**: Filenames are sanitized via Werkzeug `secure_filename`, restricted to image extensions (PNG, JPG, WEBP), and limited to 5MB.
+
+
+## 📸 Project Screenshots
+
+### 1. Homepage
+![Homepage](screenshots/Homepage.png)
+
+### 2. Marketplace
+![Marketplace](screenshots/Marketplace.png)
+
+### 3. Shopping Cart
+![Cart](screenshots/Cart.png)
+
+### 4. Order Success
+![Order Success](screenshots/Order%20Success.png)
+
+### 5. Pickup Location
+![Pickup Location](screenshots/Pickup%20location.png)
+
+### 6. Seller Dashboard
+![Seller Dashboard](screenshots/Seller%20Dashboard.png)
+
+### 7. Seller Listing Product
+![Seller Listing Product](screenshots/Seller%20listing%20product.png)
+
+### 8. ERP Dashboard
+![ERP Dashboard](screenshots/ERP%20Dashboard.png)
+
+### 9. ERP Inventory
+![ERP Inventory](screenshots/ERP%20Inventory.png)
