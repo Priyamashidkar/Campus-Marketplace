@@ -298,13 +298,14 @@ def complaints():
         complaint = Complaint.query.get_or_404(complaint_id)
         if new_status:
             complaint.status = new_status
-        if admin_notes:
+        if "admin_notes" in request.form:
             complaint.admin_notes = admin_notes
         complaint.updated_at = datetime.utcnow()
 
         db.session.commit()
         flash(f"Complaint {complaint.ticket_number} updated to '{complaint.status}'.", "success")
-        return redirect(url_for("admin.complaints"))
+        next_url = request.form.get("next") or request.referrer or url_for("admin.complaints")
+        return redirect(next_url)
 
     status_filter = request.args.get("status", "all")
     query = Complaint.query
@@ -314,6 +315,29 @@ def complaints():
 
     all_complaints = query.order_by(Complaint.created_at.desc()).all()
     return render_template("admin/complaints.html", complaints=all_complaints, status_filter=status_filter)
+
+
+@admin_bp.route("/complaints/<int:complaint_id>", methods=["GET", "POST"])
+@admin_required
+def complaint_detail(complaint_id: int):
+    """ERP Dispute Details: View complete ticket info and update status."""
+    complaint = Complaint.query.get_or_404(complaint_id)
+    if request.method == "POST":
+        new_status = request.form.get("status", "")
+        admin_notes = request.form.get("admin_notes", "").strip()
+
+        if new_status:
+            complaint.status = new_status
+        if "admin_notes" in request.form:
+            complaint.admin_notes = admin_notes
+        complaint.updated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash(f"Complaint {complaint.ticket_number} updated to '{complaint.status}'.", "success")
+        next_url = request.form.get("next") or request.referrer or url_for("admin.complaint_detail", complaint_id=complaint.id)
+        return redirect(next_url)
+
+    return render_template("admin/complaint_detail.html", complaint=complaint)
 
 
 @admin_bp.route("/reports")

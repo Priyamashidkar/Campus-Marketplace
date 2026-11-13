@@ -90,7 +90,7 @@
             {% endif %}
 
             <!-- Lodge Complaint Button -->
-            <a href="{{ url_for('student.complaints') }}" class="btn btn-outline-secondary btn-sm" title="Lodge complaint regarding this order">
+            <a href="{{ url_for('student.complaints', order_id=order.id) }}" class="btn btn-outline-secondary btn-sm" title="Lodge complaint regarding this order">
               <i class="bi bi-shield-exclamation me-1"></i> Help / Dispute
             </a>
           </div>

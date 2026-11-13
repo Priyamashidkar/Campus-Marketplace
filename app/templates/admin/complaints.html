@@ -36,7 +36,11 @@
       <tbody>
         {% for comp in complaints %}
         <tr>
-          <td><strong class="text-navy"><code>{{ comp.ticket_number }}</code></strong></td>
+          <td>
+            <a href="{{ url_for('admin.complaint_detail', complaint_id=comp.id) }}" class="text-decoration-none" title="View Ticket Details">
+              <strong class="text-navy"><code>{{ comp.ticket_number }}</code></strong>
+            </a>
+          </td>
           <td><small class="text-muted">{{ comp.created_at.strftime('%d %b %Y') }}</small></td>
           <td>
             <span class="fw-semibold">{{ comp.student.full_name }}</span><br>
@@ -102,13 +106,18 @@
 
                   <div class="mb-3">
                     <label class="form-label fw-semibold">Official Administrator Resolution Notes</label>
-                    <textarea class="form-control" name="admin_notes" rows="4" placeholder="Enter findings, resolution actions, or mediator instructions for the student..." required>{{ comp.admin_notes or '' }}</textarea>
+                    <textarea class="form-control" name="admin_notes" rows="4" placeholder="Enter findings, resolution actions, or mediator instructions for the student...">{{ comp.admin_notes or '' }}</textarea>
                     <small class="text-muted">This response will be visible to the student in their dispute ticket history.</small>
                   </div>
                 </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-success btn-sm fw-bold">Save Resolution</button>
+                <div class="modal-footer d-flex justify-content-between">
+                  <a href="{{ url_for('admin.complaint_detail', complaint_id=comp.id) }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Full Page View
+                  </a>
+                  <div>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success btn-sm fw-bold">Save Resolution</button>
+                  </div>
                 </div>
               </form>
             </div>

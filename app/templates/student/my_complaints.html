@@ -23,7 +23,7 @@
             <select class="form-select" id="order_id" name="order_id">
               <option value="">-- General Campus Inquiry / Not Order Specific --</option>
               {% for ord in orders %}
-              <option value="{{ ord.id }}">{{ ord.order_number }} (₹{{ ord.total_amount }} - {{ ord.status }})</option>
+              <option value="{{ ord.id }}" {% if selected_order_id == ord.id %}selected{% endif %}>{{ ord.order_number }} (₹{{ ord.total_amount }} - {{ ord.status }})</option>
               {% endfor %}
             </select>
           </div>

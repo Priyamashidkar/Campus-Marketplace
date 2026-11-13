@@ -183,10 +183,10 @@
     </div>
   </div>
 
-  <!-- Low Stock Alert -->
+  <!-- Low Stock Alert & Recent Complaints -->
   <div class="col-lg-5">
     <!-- Low Stock Alert Card -->
-    <div class="card card-custom p-4 border-0 bg-white shadow-sm h-100">
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold text-danger mb-0">
           <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Low-Stock Inventory Alerts
@@ -212,8 +212,104 @@
       <p class="text-success small mb-0"><i class="bi bi-check-circle me-1"></i>All inventory stock levels are healthy.</p>
       {% endif %}
     </div>
+
+    <!-- Recent Complaints Card -->
+    <div class="card card-custom p-4 border-0 bg-white shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-navy mb-0">
+          <i class="bi bi-shield-exclamation text-warning me-2"></i>Recent Dispute Tickets
+        </h5>
+        <a href="{{ url_for('admin.complaints') }}" class="btn btn-outline-navy btn-sm">Review All</a>
+      </div>
+
+      {% if recent_complaints %}
+      <ul class="list-group list-group-flush">
+        {% for comp in recent_complaints %}
+        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center" role="button" data-bs-toggle="modal" data-bs-target="#dashboardTicketModal{{ comp.id }}" style="cursor: pointer;">
+          <div>
+            <strong class="d-block text-navy small">{{ comp.ticket_number }}</strong>
+            <small class="text-muted text-truncate d-inline-block" style="max-width: 180px;">{{ comp.subject }}</small>
+          </div>
+          <span class="badge {{ comp.status_badge_class }}">{{ comp.status }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-muted small mb-0"><i class="bi bi-check2-circle text-success me-1"></i>No pending student dispute tickets.</p>
+      {% endif %}
+    </div>
   </div>
 </div>
+
+<!-- Dashboard Ticket Detail & Resolution Modals -->
+{% for comp in recent_complaints %}
+<div class="modal fade" id="dashboardTicketModal{{ comp.id }}" tabindex="-1" aria-labelledby="dashboardTicketModalLabel{{ comp.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('admin.complaints') }}">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="dashboardTicketModalLabel{{ comp.id }}">
+            <i class="bi bi-shield-exclamation text-warning me-2"></i>Ticket: {{ comp.ticket_number }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="complaint_id" value="{{ comp.id }}">
+          <input type="hidden" name="next" value="{{ url_for('admin.dashboard') }}">
+
+          <div class="p-3 bg-light rounded border mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <strong>Complainant:</strong> {{ comp.student.full_name }} (<code>{{ comp.student.student_id }}</code> - {{ comp.student.email }})
+              </div>
+              <span class="badge {{ comp.status_badge_class }}">{{ comp.status }}</span>
+            </div>
+            <div class="text-muted small mb-2">
+              <i class="bi bi-calendar3 me-1"></i>Filed: {{ comp.created_at.strftime('%d %b %Y, %I:%M %p') }}
+            </div>
+            <strong>Subject:</strong> {{ comp.subject }}<br>
+            {% if comp.order %}
+            <strong>Referenced Order:</strong>
+            <a href="{{ url_for('student.order_tracking', order_number=comp.order.order_number) }}" target="_blank">
+              {{ comp.order.order_number }}
+            </a>
+            (Total: ₹{{ comp.order.total_amount }}, Seller: {{ comp.order.seller.student_id }})<br>
+            {% endif %}
+            <hr class="my-2">
+            <strong>Student Grievance Description:</strong>
+            <p class="mt-1 mb-0 text-dark small" style="white-space: pre-line;">{{ comp.description }}</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Update Ticket Status</label>
+            <select class="form-select" name="status" required>
+              <option value="Pending" {% if comp.status == 'Pending' %}selected{% endif %}>Pending</option>
+              <option value="Under Review" {% if comp.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+              <option value="Resolved" {% if comp.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+              <option value="Rejected" {% if comp.status == 'Rejected' %}selected{% endif %}>Rejected / Dismissed</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Official Administrator Resolution Notes</label>
+            <textarea class="form-control" name="admin_notes" rows="3" placeholder="Enter findings, resolution actions, or instructions...">{{ comp.admin_notes or '' }}</textarea>
+            <small class="text-muted">Visible to the student in their dispute ticket history.</small>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <a href="{{ url_for('admin.complaint_detail', complaint_id=comp.id) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-box-arrow-up-right me-1"></i> Full Page View
+          </a>
+          <div>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success btn-sm fw-bold">Save Resolution</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
 {% endblock %}
 
 {% block extra_scripts %}

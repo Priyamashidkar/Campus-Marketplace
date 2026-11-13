@@ -406,6 +406,7 @@ def complaints():
         flash(f"Complaint {ticket_number} lodged successfully. Campus Admin will review it shortly.", "success")
         return redirect(url_for("student.complaints"))
 
+    selected_order_id = request.args.get("order_id", type=int)
     my_complaints = Complaint.query.filter_by(student_id=current_user.id).order_by(Complaint.created_at.desc()).all()
     my_orders = Order.query.filter_by(buyer_id=current_user.id).order_by(Order.created_at.desc()).all()
 
@@ -413,6 +414,7 @@ def complaints():
         "student/my_complaints.html",
         complaints=my_complaints,
         orders=my_orders,
+        selected_order_id=selected_order_id,
     )
 
 
